@@ -2,10 +2,41 @@
 //
 
 #include <iostream>
-
+#include <string>
+using namespace std;
+//Constants that will be used in feed calculation
+const int GREENS_FEED = 50;
+const int VEGGIE_FEED = 100;
 int main()
 {
-    std::cout << "Hello World!\n";
+    string plantType; //Varaiable I want to sue in future if statement to automatically calculate feed needs without displaying both types. 
+    int growingSpace;
+    string growersName;
+    int gallonsUsed;
+
+
+
+    cout << "Hello welcome to my aquaponics helper program!\n";
+    //Next lines are gathering info
+    cout << "What is your name?" << endl;
+    cin >> growersName;
+    cout << "What are we growing today? Please type out either veggies or greens?" << endl;
+    cin >> plantType;
+    cout << "How many square feet of growing space are we using?" << endl;
+    cin >> growingSpace;
+    cout << "How many gallons of water are we using for this system?" << endl;
+    //Output for information gathered from the user.
+    cin >> gallonsUsed;
+    cout << "Hello " << growersName << "! Today we are growing " << plantType << " in " << growingSpace << " square feet using " << gallonsUsed << " of water." << endl;
+    //This is my calcualation for feed per square foot of growing space.
+    cout << " if you are growing veggies, you will need " << VEGGIE_FEED * growingSpace << " grams of feed. If you are growing greens, you will need " << GREENS_FEED * growingSpace << " grams of feed." << endl;
+
+
+        return 0;
+
+
+
+
 }
 
 // Run program: Ctrl + F5 or Debug > Start Without Debugging menu
