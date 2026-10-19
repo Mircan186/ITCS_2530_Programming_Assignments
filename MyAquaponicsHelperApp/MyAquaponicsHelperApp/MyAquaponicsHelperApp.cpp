@@ -30,7 +30,7 @@ int main()
     cout << " " << endl;
     cout << "Hello " << growersName << "!" << endl;
     cout << "Today we are growing " << plantType << " in " << growingSpace << " square feet using " << gallonsUsed << " gallons of water." << endl;
-
+    cout << " " << endl;
     //This is my calcualation for feed per square foot of growing space.
     cout << "If you are growing veggies, you will need " << VEGGIE_FEED * growingSpace << " grams of feed." << endl;
     cout << "If you are growing greens, you will need " << GREENS_FEED * growingSpace << " grams of feed." << endl;
