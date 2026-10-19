@@ -1,7 +1,0 @@
-<Solution>
-  <Configurations>
-    <Platform Name="x64" />
-    <Platform Name="x86" />
-  </Configurations>
-  <Project Path="MyAquaponicsHelperApp/MyAquaponicsHelperApp.vcxproj" Id="ffc55c32-be89-4d75-b35d-9d52527b2dd3" />
-</Solution>
