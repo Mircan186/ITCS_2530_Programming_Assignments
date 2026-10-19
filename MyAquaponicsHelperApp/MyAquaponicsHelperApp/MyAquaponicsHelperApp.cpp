@@ -28,7 +28,7 @@ int main()
     //Output for information gathered from the user.
     cin >> gallonsUsed;
     cout << " " << endl;
-    cout << "Hello " << growersName << "!\n" << endl;
+    cout << "Hello " << growersName << "!" << endl;
     cout << "Today we are growing " << plantType << " in " << growingSpace << " square feet using " << gallonsUsed << " gallons of water." << endl;
 
     //This is my calcualation for feed per square foot of growing space.
