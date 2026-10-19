@@ -21,8 +21,8 @@
   <PropertyGroup Label="Globals">
     <VCProjectVersion>18.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{b41ca608-e9e6-4a7a-8136-4630d2c70ea9}</ProjectGuid>
-    <RootNamespace>MyNewApp</RootNamespace>
+    <ProjectGuid>{ffc55c32-be89-4d75-b35d-9d52527b2dd3}</ProjectGuid>
+    <RootNamespace>MyAquaponicsHelperApp</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -139,7 +139,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="MyNewApp.cpp" />
+    <ClCompile Include="MyAquaponicsHelperApp.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
