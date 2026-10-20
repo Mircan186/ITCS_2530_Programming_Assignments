@@ -26,16 +26,14 @@ int main()
 
 
 
-
-
-
-
-
     cout << "Hello, welcome to my aquaponics helper program!\n" << endl; //friendly introduction banner
     cout << "What is the name of this aquaponic system?" << endl;
     getline(cin, systemName);
+    cout << " " << endl;
 
     cout << systemName << "? Great name! Now let's get some information about your fish.\n" << endl;
+    
+    //Info about fish portion of app
     //Ask use for Fish count
     cout << "About how many fish are in your system currently?" << endl;
     if (cin >> fishCount);
@@ -57,7 +55,6 @@ int main()
     }
     //Finds the total biomass for the system
     totalBiomas = fishAvgWeight * fishCount;
-    cout << "This is the toal biomass for your system: " << totalBiomas << endl;
 
 
     //Info about plant portion of system
@@ -82,15 +79,15 @@ int main()
         cin >> gallonsUsed;
     }
     cout << " " << endl;
-    cout << "Today we are growing " << plantType << " in " << growingSpace << " square feet using " << gallonsUsed << " gallons of water." << endl;
-    cout << " " << endl;
+
     //This is my calcualation for feed per square foot of growing space.
     veggieFeed = VEGGIE_FEED * growingSpace;
     greensFeed = GREENS_FEED * growingSpace;
     cout << "If you are growing veggies, you will need " << veggieFeed << " grams of feed." << endl;
     cout << "If you are growing greens, you will need " << greensFeed << " grams of feed." << endl;
 
-
+    cout << " " << endl;
+    cout << " " << endl;
     //Output for the data collected and calculated.
     cout << fixed << setprecision(2);
     cout << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
@@ -102,6 +99,8 @@ int main()
     cout << "Total gallons of water used:" << setw(25) << setfill('.') << gallonsUsed << endl;
     cout << "Recommended amount of plant feed for veggies:" << setw(13) << setfill('.') << veggieFeed << endl;
     cout << "Recommended amount of plant feed for greens:" << setw(14) << setfill('.') << greensFeed << endl;
+    
+    
     //Sending data to report.txt
     outData.open("report.txt");
     outData << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
