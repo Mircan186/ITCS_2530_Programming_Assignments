@@ -1,0 +1,9 @@
+***********Kat's fish and farm Report*********************
+Fish in system:....................................30
+Average weight of fish:............................3
+System's total biomass:............................90
+System is currently growing:.......................Veggies
+Square feet used for growing:......................20
+Total gallons of water used:.......................20
+Recommended amount of plant feed for veggies:......2000
+Recommended amount of plant feed for greens:.......1000
