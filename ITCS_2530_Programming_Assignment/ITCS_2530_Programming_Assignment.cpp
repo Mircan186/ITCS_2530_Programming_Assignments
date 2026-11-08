@@ -41,6 +41,9 @@ int main() {
     string cropType; //Variable to be used in if statement to determine what type of crop the user is growing in their system.
 	double waterPH; //Variable to be used in if statement to determine if the water PH is within the correct range for the type of fish the user is growing.
 	int fishLifeStage; //Variable to be used in if statement to determine what stage of life the fish are in and what type of feed they need.
+	int timeFishFed; // Variable to be used in for loop to determine how many days the user has fed their fish.
+	double feedAmount = 0; //Variable to be used in for loop to determine how much feed the user has given their fish over the course of a week.
+	double dailyFeedAmount; //Variable to be used in for loop to determine how much feed the user has given their fish each day.
    
     cout << "Hello, welcome to my aquaponics helper program!\n" << endl; //friendly introduction banner
     cout << "What is the name of this aquaponic system?" << endl;
@@ -121,13 +124,12 @@ int main() {
 	cout << "What is the current water PH in your system?" << endl;
 
 	cin >> waterPH;
-    cout << setprecision(1) << waterPH;
+    cout << fixed << setprecision(1) << waterPH;
 	if (waterPH);
 	else {
 		cout << "Please enter a number for water PH." << endl;
 		cin.clear();
 		cin.ignore(100, '\n');
-		cin >> waterPH;
 	}
 
     bool keepRunningMenu = true;
@@ -138,7 +140,8 @@ int main() {
         cout << "2. Calculate plant feed needs.\n" << endl;
         cout << "3. Check water quality\n" << endl;
         cout << "4. Write report\n" << endl;
-        cout << "5. Exit program\n" << endl;
+		cout << "5. Check how much fish were fed this week\n" << endl;
+        cout << "6. Exit program\n" << endl;
         cin >> userActivity;
 
         switch (userActivity) {
@@ -183,17 +186,19 @@ int main() {
                     else
                         cout << "The water temperature is within the optimal range for cold-water fish." << endl;
                 }
-                if (waterPH <= 6.5 || waterPH >= 7.0)
+                if (waterPH < 6.4 || waterPH > 6.9)
                 {
                     cout << "Warning: The water PH is outside the optimal range for fish." << endl;
 
-                    while (waterPH <= 6.5 || waterPH >= 7.0) {
-                        if (waterPH <= 6.5) {
+                    while (waterPH < 6.4 || waterPH > 6.9) {
+                        if (waterPH < 6.4) {
 
                             cout << "Add one ml of pH up and remeasure." << endl;
+                            cout << waterPH << endl;
                         cin >> waterPH;
+						cout << fixed << setprecision(1) << waterPH;
                         }
-                        else if (waterPH >= 7.0){
+                        else if (waterPH > 6.9){
                             cout << "Add one ml of pH down and remeasure." << endl;
                             cin >> waterPH;
                         }
@@ -225,6 +230,21 @@ int main() {
             cout << "Recommended amount of plant feed for greens:" << setw(14) << setfill('.') << greensFeed << endl;
             break;
         case 5:
+            for (timeFishFed = 1; timeFishFed <= 7; timeFishFed++) {
+                cout << "How many grams of feed did you give your fish on day " << timeFishFed << "?" << endl;
+                cin >> dailyFeedAmount;
+                if (dailyFeedAmount);
+                else {
+                    cout << "Please enter a number for the amount of feed given." << endl;
+                    cin.clear();
+                    cin.ignore(100, '\n');
+                    cin >> dailyFeedAmount;
+                }
+                feedAmount = feedAmount + dailyFeedAmount;
+            }
+            cout << "Your fish were fed a total of " << feedAmount << " grams of feed over the last 7 days.\n" << endl;
+            break;
+        case 6:
             keepRunningMenu = false;
             break;
 
