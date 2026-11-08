@@ -4,6 +4,8 @@
 #include <string>
 #include <iomanip>
 #include <fstream>
+
+
 //hello
 
 using namespace std;
@@ -16,6 +18,9 @@ const double Juvenile_Warm_Fish_Feed = .05;
 const double Adult_Warm_Fish_Feed = .025;
 const double Juvenile_Cold_Fish_Feed = .06;
 const double Adult_Cold_Fish_Feed = .015;
+
+
+
 int main() {
     //Declaring Variable
 
@@ -36,6 +41,7 @@ int main() {
     string cropType; //Variable to be used in if statement to determine what type of crop the user is growing in their system.
 	double waterPH; //Variable to be used in if statement to determine if the water PH is within the correct range for the type of fish the user is growing.
 	int fishLifeStage; //Variable to be used in if statement to determine what stage of life the fish are in and what type of feed they need.
+   
     cout << "Hello, welcome to my aquaponics helper program!\n" << endl; //friendly introduction banner
     cout << "What is the name of this aquaponic system?" << endl;
     getline(cin, systemName);
@@ -93,13 +99,15 @@ int main() {
     }
     cout << " " << endl;
 
+   
+
     //This is my calcualation for feed per square foot of growing space.
     veggieFeed = VEGGIE_FEED * growingSpace;
     greensFeed = GREENS_FEED * growingSpace;
 
     if (plantType == "1")
         cropType = "Vegetables";
-	else (cropType = "Greens");
+	else (cropType = "Greens    ");
 	cout << "Great! Now lets get some infomation about your water quality." << endl;
 	cout << "What is the current water temperature in your system?" << endl;
 	cin >> waterTemp;
@@ -113,6 +121,7 @@ int main() {
 	cout << "What is the current water PH in your system?" << endl;
 
 	cin >> waterPH;
+    cout << setprecision(1) << waterPH;
 	if (waterPH);
 	else {
 		cout << "Please enter a number for water PH." << endl;
@@ -121,93 +130,115 @@ int main() {
 		cin >> waterPH;
 	}
 
-    cout << "Please select from the following options:\n" << endl;
-    cout << "1. Calculate fish feed needs for your system.\n" << endl;
-    cout << "2. Calculate plant feed needs.\n" << endl;
-    cout << "3. Check water quality\n" << endl;
-    cout << "4. Write report\n" << endl;
-	cin >> userActivity;
+    bool keepRunningMenu = true;
 
+    do {
+        cout << "Please select from the following options:\n" << endl;
+        cout << "1. Calculate fish feed needs for your system.\n" << endl;
+        cout << "2. Calculate plant feed needs.\n" << endl;
+        cout << "3. Check water quality\n" << endl;
+        cout << "4. Write report\n" << endl;
+        cout << "5. Exit program\n" << endl;
+        cin >> userActivity;
 
-    switch (userActivity) {
-    case 1:
-        cout << "What life stage are your fish in? Type 1 for juvenile, 2 for adult." << endl;
-        cin >> fishLifeStage;
-        if (fishLifeStage == 1 && fishType == 1) {
-            double juvenileWarmFishFeed = totalBiomas * Juvenile_Warm_Fish_Feed;
-            cout << "You are growing warm-water fish in the juvenile stage and need " << juvenileWarmFishFeed << " grams of feed." << endl;
-        }
-        else if (fishLifeStage == 2 && fishType == 1) {
-            double adultWarmFishFeed = totalBiomas * Adult_Warm_Fish_Feed;
-            cout << "You are growing warm-water fish in the adult stage and need " << adultWarmFishFeed << " grams of feed." << endl;
-        }
-        else if (fishLifeStage == 1 && fishType == 2) {
-            double juvenileColdFishFeed = totalBiomas * Juvenile_Cold_Fish_Feed;
-            cout << "You are growing cold-water fish in the juvenile stage and need " << juvenileColdFishFeed << " grams of feed." << endl;
-        }
-        else {
-            double adultColdFishFeed = totalBiomas * Adult_Cold_Fish_Feed;
-            cout << "You are growing cold-water fish in the adult stage and need " << adultColdFishFeed << " grams of feed." << endl;
-        }
-        break;
-
-
-    case 2:
-        if (plantType == "1") {
-            cout << "You are growing vegetables and need " << veggieFeed << " grams of feed." << endl;
-        }
-        else
-            cout << "You are growing cool-season crops and need " << greensFeed << " grams of feed." << endl;
-        break;
-    case 3:
-        if (fishType == 1) {
-            if (waterTemp <= 70 || waterTemp >= 85) {
-                cout << "Warning: The water temperature is outside the optimal range for warm-water fish." << endl;
+        switch (userActivity) {
+        case 1:
+            cout << "What life stage are your fish in? Type 1 for juvenile, 2 for adult." << endl;
+            cin >> fishLifeStage;
+            if (fishLifeStage == 1 && fishType == 1) {
+                double juvenileWarmFishFeed = totalBiomas * Juvenile_Warm_Fish_Feed;
+                cout << "You are growing warm-water fish in the juvenile stage and need " << juvenileWarmFishFeed << " grams of feed." << endl;
+            }
+            else if (fishLifeStage == 2 && fishType == 1) {
+                double adultWarmFishFeed = totalBiomas * Adult_Warm_Fish_Feed;
+                cout << "You are growing warm-water fish in the adult stage and need " << adultWarmFishFeed << " grams of feed." << endl;
+            }
+            else if (fishLifeStage == 1 && fishType == 2) {
+                double juvenileColdFishFeed = totalBiomas * Juvenile_Cold_Fish_Feed;
+                cout << "You are growing cold-water fish in the juvenile stage and need " << juvenileColdFishFeed << " grams of feed." << endl;
             }
             else {
-                cout << "The water temperature is within the optimal range for warm-water fish." << endl;
-            }
-            if (fishType == 2) {
-                if (waterTemp <= 55 || waterTemp >= 65) {
-                    cout << "Warning: The water temperature is outside the optimal range for cold-water fish." << endl;
-                }
-                else {
-                    cout << "The water temperature is within the optimal range for cold-water fish." << endl;
-                }
-            }
-            if (waterPH <= 6.5 || waterPH >= 7.0) {
-                cout << "Warning: The water PH is outside the optimal range for fish." << endl;
-            }
-            else {
-                cout << "The water PH is within the optimal range for fish." << endl;
+                double adultColdFishFeed = totalBiomas * Adult_Cold_Fish_Feed;
+                cout << "You are growing cold-water fish in the adult stage and need " << adultColdFishFeed << " grams of feed." << endl;
             }
             break;
-    case 4:
-        cout << "Generating report..." << endl;
 
-        cout << " " << endl;
-        cout << " " << endl;
-        //Output for the data collected and calculated.
-        cout << fixed << setprecision(2);
-        cout << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
-        cout << "Fish in system:" << setw(38) << setfill('.') << fishCount << endl;
-        cout << "Average weight of fish:" << setw(32) << setfill('.') << fishAvgWeight << endl;
-        cout << "System's total biomass:" << setw(33) << setfill('.') << totalBiomas << endl;
 
-        cout << "System is currently growing:" << setw(33) << setfill('.') << cropType << endl;
-        cout << "Square feet used for growing:" << setw(24) << setfill('.') << growingSpace << endl;
-        cout << "Total gallons of water used:" << setw(25) << setfill('.') << gallonsUsed << endl;
-        cout << "Recommended amount of plant feed for veggies:" << setw(13) << setfill('.') << veggieFeed << endl;
-        cout << "Recommended amount of plant feed for greens:" << setw(14) << setfill('.') << greensFeed << endl;
-    default:
-        cout << "Invalid selection. Please try again." << endl;
-        break;
+        case 2:
+            if (plantType == "1") {
+                cout << "You are growing vegetables and need " << veggieFeed << " grams of feed." << endl;
+            }
+            else
+                cout << "You are growing cool-season crops and need " << greensFeed << " grams of feed." << endl;
+            break;
+        case 3:
+            if (fishType == 1) {
+                if (waterTemp <= 70 || waterTemp >= 85)
+                    cout << "Warning: The water temperature is outside the optimal range for warm-water fish." << endl;
+                else
+                    cout << "The water temperature is within the optimal range for warm-water fish." << endl;
+                if (fishType == 2) {
+                    if (waterTemp <= 55 || waterTemp >= 65)
+                        cout << "Warning: The water temperature is outside the optimal range for cold-water fish." << endl;
+                    else
+                        cout << "The water temperature is within the optimal range for cold-water fish." << endl;
+                }
+                if (waterPH <= 6.5 || waterPH >= 7.0)
+                {
+                    cout << "Warning: The water PH is outside the optimal range for fish." << endl;
+
+                    while (waterPH <= 6.5 || waterPH >= 7.0) {
+                        if (waterPH <= 6.5) {
+
+                            cout << "Add one ml of pH up and remeasure." << endl;
+                        cin >> waterPH;
+                        }
+                        else if (waterPH >= 7.0){
+                            cout << "Add one ml of pH down and remeasure." << endl;
+                            cin >> waterPH;
+                        }
+
+                    }
+                    cout << "Water pH is back within range." << endl;
+                }
+                else
+                    cout << "The water PH is within the optimal range for fish." << endl;
+            }
+            break;
+
+        case 4:
+            cout << "Generating report..." << endl;
+
+            cout << " " << endl;
+            cout << " " << endl;
+            //Output for the data collected and calculated.
+            cout << fixed << setprecision(2);
+            cout << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
+            cout << "Fish in system:" << setw(38) << setfill('.') << fishCount << endl;
+            cout << "Average weight of fish:" << setw(32) << setfill('.') << fishAvgWeight << endl;
+            cout << "System's total biomass:" << setw(33) << setfill('.') << totalBiomas << endl;
+
+            cout << "System is currently growing:" << setw(33) << setfill('.') << cropType << endl;
+            cout << "Square feet used for growing:" << setw(24) << setfill('.') << growingSpace << endl;
+            cout << "Total gallons of water used:" << setw(25) << setfill('.') << gallonsUsed << endl;
+            cout << "Recommended amount of plant feed for veggies:" << setw(13) << setfill('.') << veggieFeed << endl;
+            cout << "Recommended amount of plant feed for greens:" << setw(14) << setfill('.') << greensFeed << endl;
+            break;
+        case 5:
+            keepRunningMenu = false;
+            break;
+
+        default:
+            cout << "Invalid selection. Please try again." << endl;
+            break;
         }
     }
+        while (keepRunningMenu);
 
     
     //Sending data to report.txt
     outData.open("report.txt");
+    cout << fixed << setprecision(2);
     outData << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
     outData << "Fish in system:" << setw(38) << setfill('.') << fishCount << endl;
     outData << "Average weight of fish:" << setw(29) << setfill('.') << fishAvgWeight << endl;
