@@ -1,296 +1,350 @@
 // MyAquaponicsHelperApp.cpp : This file contains the 'main' function. Program execution begins and ends there.
-//
+
 #include <iostream>
 #include <string>
 #include <iomanip>
 #include <fstream>
 #include <windows.h>
+
 using namespace std;
 
-void setColor(int color) {
-	HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
-	SetConsoleTextAttribute(hConsole, color);
-}
-void displayBanner() {
-    cout << "**************************************************" << endl;
-    cout << "*                                                *" << endl;
-    cout << "*          Welcome to My Aquaponics Helper       *" << endl;
-    cout << "*                                                *" << endl;
-    cout << "**************************************************" << endl;
-}
-void inputValidation(int& input) {
-	while (!(cin >> input)) {
-		cout << "Invalid input. Please enter a number: ";
-		cin.clear();
-		cin.ignore(100, '\n');
-	}
-}
-void inputValidation(double& input) {
-	while (!(cin >> input)) {
-		cout << "Invalid input. Please enter a number: ";
-		cin.clear();
-		cin.ignore(100, '\n');
-	}
-}
-double calculatePlantFeed(int growingSpace, int plantType) {
-	const int VEGGIE_FEED = 100;
-	const int GREENS_FEED = 50;
-	if (plantType == 1) {
-		return VEGGIE_FEED * growingSpace;
-	}
-	else if (plantType == 2) {
-		return GREENS_FEED * growingSpace;
-	}
-	else {
-		return 0; // Invalid plant type
-	}
-}
-void userMenu()
+// Enum for fish water type
+enum FishWaterType { WARM_WATER = 1, COLD_WATER = 2 };
+
+// Constants used in feed calculation
+const double JUVENILE_WARM_FISH_FEED = 0.05;
+const double ADULT_WARM_FISH_FEED = 0.025;
+const double JUVENILE_COLD_FISH_FEED = 0.06;
+const double ADULT_COLD_FISH_FEED = 0.015;
+const int DAYS = 7;
+
+// Function prototypes
+void setColor(int color);
+void welcomeBanner();
+string getValidString(string prompt);
+int getValidInt(string prompt, int minVal, int maxVal);
+double getValidDouble(string prompt, double minVal, double maxVal);
+double plantFeed(int growingSpace, int plantType);
+void trackWeeklyFeed(double dailyFeed[], string dayNames[], int size);
+void userMenu();
+void saveReport(string systemName, int fishCount, double fishAvgWeight, double totalBiomass, string cropType, int growingSpace, int gallonsUsed, double weeklyTotal);
+
+int main()
 {
-	cout << "Please select from the following options:\n" << endl;
-	cout << "1. Calculate fish feed needs for your system.\n" << endl;
-	cout << "2. Calculate plant feed needs.\n" << endl;
-	cout << "3. Check water quality\n" << endl;
-	cout << "4. Write report\n" << endl;
-	cout << "5. Exit program\n" << endl;
-}
-void printReport(string systemName, int fishCount, double fishAvgWeight, double totalBiomas, string cropType, int growingSpace, int gallonsUsed, double veggieFeed, double greensFeed) {
-    cout << "Generating report..." << endl;
+    setColor(9); // Light blue text
+    welcomeBanner();
 
-    cout << " " << endl;
-    cout << " " << endl;
-    //Output for the data collected and calculated.
-    cout << fixed << setprecision(2);
-    cout << setw(30) << setfill('*') << systemName << " Report*********************" << endl;
-    cout << "Fish in system:" << setw(38) << setfill('.') << fishCount << endl;
-    cout << "Average weight of fish:" << setw(32) << setfill('.') << fishAvgWeight << endl;
-    cout << "System's total biomass:" << setw(33) << setfill('.') << totalBiomas << endl;
-
-    cout << "System is currently growing:" << setw(33) << setfill('.') << cropType << endl;
-    cout << "Square feet used for growing:" << setw(24) << setfill('.') << growingSpace << endl;
-    cout << "Total gallons of water used:" << setw(25) << setfill('.') << gallonsUsed << endl;
-    cout << "Recommended amount of plant feed for veggies:" << setw(13) << setfill('.') << calculatePlantFeed(growingSpace, 1) << endl;
-    cout << "Recommended amount of plant feed for greens:" << setw(14) << setfill('.') << calculatePlantFeed(growingSpace, 2) << endl;
-}
-void saveReport(string systemName, int fishCount, double fishAvgWeight, double totalBiomas, string cropType, int growingSpace, int gallonsUsed, double veggieFeed, double greensFeed){
-    ofstream outData;
-    outData.open("report.txt");
-    cout << fixed << setprecision(2);
-    outData << setw(30) << setfill('.') << systemName << " Report**" << endl;
-    outData << "Fish in system:" << setw(38) << setfill('.') << fishCount << endl;
-    outData << "Average weight of fish:" << setw(29) << setfill('.') << fishAvgWeight << endl;
-    outData << "System's total biomass:" << setw(30) << setfill('.') << totalBiomas << endl;
-    outData << "System is currently growing:" << setw(33) << setfill('.') << cropType << endl;
-    outData << "Square feet used for growing:" << setw(24) << setfill('.') << growingSpace << endl;
-    outData << "Total gallons of water used:" << setw(25) << setfill('.') << gallonsUsed << endl;
-    outData << "Recommended amount of plant feed for veggies:" << setw(10) << setfill('.') << veggieFeed << endl;
-    outData << "Recommended amount of plant feed for greens:" << setw(11) << setfill('.') << greensFeed << endl;
-
-}
-
-//Constants that will be used in feed calculation
-const double Juvenile_Warm_Fish_Feed = .05;
-const double Adult_Warm_Fish_Feed = .025;
-const double Juvenile_Cold_Fish_Feed = .06;
-const double Adult_Cold_Fish_Feed = .015;
-
-
-
-int main() {
-    //Declaring Variable
-    setColor(9);
-    displayBanner();
-
-    string plantType; //Varaiable I want to sue in future if statement to automatically calculate feed needs without displaying both types. 
-    int growingSpace;
+    // System info variables
     string systemName;
-    int gallonsUsed;
+    int userFishType;
+    FishWaterType waterType;
     int fishCount;
     double fishAvgWeight;
-    double totalBiomas; //Based off fish count and fish weight. Derived value
-    double veggieFeed;
-    double greensFeed;
-    ofstream  outData;
-    int fishType; //Variable to be used in if statement to determine what type of fish the user is growing in their system.
-    double waterTemp; //Variable to be used in if statement to determine if the water temperature is within the correct range for the type of fish the user is growing.
-    int userActivity; //Variable to be used in switch statement to determine what the user wants to do with the program.
+    double totalBiomass;
 
-    string cropType; //Variable to be used in if statement to determine what type of crop the user is growing in their system.
-    double waterPH; //Variable to be used in if statement to determine if the water PH is within the correct range for the type of fish the user is growing.
-    int fishLifeStage; //Variable to be used in if statement to determine what stage of life the fish are in and what type of feed they need.
-    int timeFishFed; // Variable to be used in for loop to determine how many days the user has fed their fish.
-    double feedAmount = 0; //Variable to be used in for loop to determine how much feed the user has given their fish over the course of a week.
-    double dailyFeedAmount; //Variable to be used in for loop to determine how much feed the user has given their fish each day.
+    int userPlantType;
+    string cropType;
+    int growingSpace;
+    int gallonsUsed;
 
-    cout << "What is the name of this aquaponic system?" << endl;
-    getline(cin, systemName);
-    cout << " " << endl;
+    double waterTemp;
+    double waterPH;
 
-    cout << systemName << "? Great name! Lets get some information about your system!\n" << endl;
+    // Arrays for 7-day feeding tracker
+    string dayNames[DAYS] = { "Day 1", "Day 2", "Day 3", "Day 4", "Day 5", "Day 6", "Day 7" };
+    double dailyFeed[DAYS] = { 0, 0, 0, 0, 0, 0, 0 };
+    double weeklyTotal = 0.0;
 
-    //Info about fish portion of app
-    cout << "What type of fish are you growing in your system? Type 1 for warm-water fish, 2 for cold-water fish." << endl;
-    cin >> fishType;
-    //Ask use for Fish count
-    cout << "About how many fish are in your system currently?" << endl;
-    if (cin >> fishCount);
-    else {
-        inputValidation(fishCount);
+    // Get system name
+    systemName = getValidString("What is the name of this aquaponic system?\n");
+    cout << "\n" << systemName << "? Great name! Let's get some information about your system!\n\n";
+
+    // Get fish info
+    userFishType = getValidInt("What type of fish are you growing? (1 = Warm-water, 2 = Cold-water): ", 1, 2);
+    if (userFishType == 1) {
+        waterType = WARM_WATER;
     }
-    //Ask user for fish weight.
-    cout << "What is the average weight of the fish in your system?" << endl;
-
-    if (cin >> fishAvgWeight);
     else {
-        inputValidation(fishAvgWeight);
+        waterType = COLD_WATER;
     }
-    //Finds the total biomass for the system
-    totalBiomas = fishAvgWeight * fishCount;
 
+    fishCount = getValidInt("About how many fish are in your system currently? ", 1, 100000);
+    fishAvgWeight = getValidDouble("What is the average weight of the fish (in grams)? ", 0.1, 50000.0);
+    totalBiomass = fishAvgWeight * fishCount;
 
-
-    //Info about plant portion of system
-
-    cout << "What are we growing today? Please enter 1 for Vegetables, 2 for greens." << endl;
-    cin >> plantType;
-    cout << "How many square feet of growing space are we using?" << endl;
-    if (cin >> growingSpace);
-    else {
-        inputValidation(growingSpace);
-
-    }
-    cout << "How many gallons of water are we using for this system?" << endl;
-    //Output for information gathered from the user.
-    if (cin >> gallonsUsed);
-    else {
-        inputValidation(gallonsUsed);
-    }
-    cout << " " << endl;
-
-
-
-    //This is my calcualation for feed per square foot of growing space.
-    if (plantType == "1")
+    // Get plant info
+    userPlantType = getValidInt("\nWhat are we growing today? (1 = Vegetables, 2 = Greens): ", 1, 2);
+    if (userPlantType == 1) {
         cropType = "Vegetables";
-    else (cropType = "Greens    ");
-
-    cout << "Great! Now lets get some infomation about your water quality." << endl;
-    cout << "What is the current water temperature in your system?" << endl;
-    cin >> waterTemp;
-    if (waterTemp);
-    else {
-        inputValidation(waterTemp);
     }
-    cout << "What is the current water PH in your system?" << endl;
-
-    cin >> waterPH;
-    cout << fixed << setprecision(1) << waterPH;
-    if (waterPH);
     else {
-        inputValidation(waterPH);
-
+        cropType = "Greens";
     }
 
-    bool keepRunningMenu = true;
+    growingSpace = getValidInt("How many square feet of growing space are we using? ", 1, 10000);
+    gallonsUsed = getValidInt("How many gallons of water are we using for this system? ", 1, 100000);
+
+    // Get water quality info
+    cout << "\nGreat! Now let's get some information about your water quality.\n";
+    waterTemp = getValidDouble("What is the current water temperature (F) in your system? ", 32.0, 120.0);
+    waterPH = getValidDouble("What is the current water pH in your system? ", 0.0, 14.0);
+
+    bool runMenu = true;
+    int userActivity;
 
     do {
+        cout << endl;
+        setColor(11);
         userMenu();
-        cin >> userActivity;
+        setColor(9);
+
+        userActivity = getValidInt("Enter your choice (1-6): ", 1, 6);
+        cout << endl;
 
         switch (userActivity) {
-        case 1:
-            cout << "What life stage are your fish in? Type 1 for juvenile, 2 for adult." << endl;
-            cin >> fishLifeStage;
-            if (fishLifeStage == 1 && fishType == 1) {
-                double juvenileWarmFishFeed = totalBiomas * Juvenile_Warm_Fish_Feed;
-                cout << "You are growing warm-water fish in the juvenile stage and need " << juvenileWarmFishFeed << " grams of feed." << endl;
-            }
-            else if (fishLifeStage == 2 && fishType == 1) {
-                double adultWarmFishFeed = totalBiomas * Adult_Warm_Fish_Feed;
-                cout << "You are growing warm-water fish in the adult stage and need " << adultWarmFishFeed << " grams of feed." << endl;
-            }
-            else if (fishLifeStage == 1 && fishType == 2) {
-                double juvenileColdFishFeed = totalBiomas * Juvenile_Cold_Fish_Feed;
-                cout << "You are growing cold-water fish in the juvenile stage and need " << juvenileColdFishFeed << " grams of feed." << endl;
-            }
-            else {
-                double adultColdFishFeed = totalBiomas * Adult_Cold_Fish_Feed;
-                cout << "You are growing cold-water fish in the adult stage and need " << adultColdFishFeed << " grams of feed." << endl;
+        case 1: {
+            int fishLifeStage = getValidInt("What life stage are your fish in? (1 = Juvenile, 2 = Adult): ", 1, 2);
+            double neededFeed = 0.0;
+
+            // Use enum in switch to calculate feed
+            switch (waterType) {
+            case WARM_WATER:
+                if (fishLifeStage == 1) {
+                    neededFeed = totalBiomass * JUVENILE_WARM_FISH_FEED;
+                    cout << fixed << setprecision(2);
+                    cout << "Warm-water juvenile fish need " << neededFeed << " grams of feed per day.\n";
+                }
+                else {
+                    neededFeed = totalBiomass * ADULT_WARM_FISH_FEED;
+                    cout << fixed << setprecision(2);
+                    cout << "Warm-water adult fish need " << neededFeed << " grams of feed per day.\n";
+                }
+                break;
+
+            case COLD_WATER:
+                if (fishLifeStage == 1) {
+                    neededFeed = totalBiomass * JUVENILE_COLD_FISH_FEED;
+                    cout << fixed << setprecision(2);
+                    cout << "Cold-water juvenile fish need " << neededFeed << " grams of feed per day.\n";
+                }
+                else {
+                    neededFeed = totalBiomass * ADULT_COLD_FISH_FEED;
+                    cout << fixed << setprecision(2);
+                    cout << "Cold-water adult fish need " << neededFeed << " grams of feed per day.\n";
+                }
+                break;
             }
             break;
-
+        }
 
         case 2:
-            if (plantType == "1") {
-                cout << "You are growing vegetables and need " << calculatePlantFeed(growingSpace, 1) << " grams of feed." << endl;
+            cout << fixed << setprecision(2);
+            if (userPlantType == 1) {
+                cout << "You are growing vegetables and need " << plantFeed(growingSpace, 1) << " grams of plant feed.\n";
             }
-            else
-                cout << "You are growing cool-season crops and need " << calculatePlantFeed(growingSpace, 2) << " grams of feed.\n" << endl;
+            else {
+                cout << "You are growing greens and need " << plantFeed(growingSpace, 2) << " grams of plant feed.\n";
+            }
             break;
+
         case 3:
-            if (fishType == 1) {
-                if (waterTemp <= 70 || waterTemp >= 85)
-                    cout << "Warning: The water temperature is outside the optimal range for warm-water fish." << endl;
-                else
-                    cout << "The water temperature is within the optimal range for warm-water fish." << endl;
-                if (fishType == 2) {
-                    if (waterTemp <= 55 || waterTemp >= 65)
-                        cout << "Warning: The water temperature is outside the optimal range for cold-water fish." << endl;
-                    else
-                        cout << "The water temperature is within the optimal range for cold-water fish." << endl;
+            setColor(14); // Yellow for warnings
+            // Check temp using enum
+            if (waterType == WARM_WATER) {
+                if (waterTemp < 70 || waterTemp > 85) {
+                    cout << "Warning: Water temperature (" << waterTemp << " F) is outside the optimal range (70-85 F) for warm-water fish.\n";
                 }
-                if (waterPH < 6.4 || waterPH > 6.9)
-                {
-                    cout << "Warning: The water PH is outside the optimal range for fish." << endl;
-
-                    while (waterPH < 6.4 || waterPH > 6.9) {
-                        if (waterPH < 6.4) {
-
-                            cout << "Add one ml of pH up and remeasure." << endl;
-                            cout << waterPH << endl;
-                            cin >> waterPH;
-                            cout << fixed << setprecision(1) << waterPH;
-                        }
-                        else if (waterPH > 6.9) {
-                            cout << "Add one ml of pH down and remeasure." << endl;
-                            cin >> waterPH;
-                        }
-
-                    }
-                    cout << "Water pH is back within range." << endl;
+                else {
+                    cout << "Water temperature is within the optimal range for warm-water fish.\n";
                 }
-                else
-                    cout << "The water PH is within the optimal range for fish." << endl;
             }
+            else if (waterType == COLD_WATER) {
+                if (waterTemp < 55 || waterTemp > 65) {
+                    cout << "Warning: Water temperature (" << waterTemp << " F) is outside the optimal range (55-65 F) for cold-water fish.\n";
+                }
+                else {
+                    cout << "Water temperature is within the optimal range for cold-water fish.\n";
+                }
+            }
+
+            // Check pH
+            if (waterPH < 6.4 || waterPH > 6.9) {
+                cout << "Warning: Water pH (" << fixed << setprecision(1) << waterPH << ") is outside the optimal range (6.4 - 6.9).\n";
+                while (waterPH < 6.4 || waterPH > 6.9) {
+                    if (waterPH < 6.4) {
+                        cout << "Add 1 ml of pH Up and remeasure.\n";
+                    }
+                    else {
+                        cout << "Add 1 ml of pH Down and remeasure.\n";
+                    }
+                    waterPH = getValidDouble("Enter new pH reading: ", 0.0, 14.0);
+                }
+                cout << "Water pH is back within the optimal range!\n";
+            }
+            else {
+                cout << "Water pH is within the optimal range for fish.\n";
+            }
+            setColor(9);
             break;
 
         case 4:
-			printReport(systemName, fishCount, fishAvgWeight, totalBiomas, cropType, growingSpace, gallonsUsed, calculatePlantFeed(growingSpace, 1), calculatePlantFeed(growingSpace, 2));
-			saveReport(systemName, fishCount, fishAvgWeight, totalBiomas, cropType, growingSpace, gallonsUsed, calculatePlantFeed(growingSpace, 1), calculatePlantFeed(growingSpace, 2));
-            break;
-        case 5:
-            for (timeFishFed = 1; timeFishFed <= 7; timeFishFed++) {
-                cout << "How many grams of feed did you give your fish on day " << timeFishFed << "?" << endl;
-                cin >> dailyFeedAmount;
-                if (dailyFeedAmount);
-                else {
-					inputValidation(dailyFeedAmount);
-                }
-                feedAmount = feedAmount + dailyFeedAmount;
+            // Add up the array before printing report
+            weeklyTotal = 0.0;
+            for (int i = 0; i < DAYS; i++) {
+                weeklyTotal += dailyFeed[i];
             }
-            cout << "Your fish were fed a total of " << feedAmount << " grams of feed over the last 7 days.\n" << endl;
-            break;
-        case 6:
-            keepRunningMenu = false;
+
+            setColor(10); // Green for report
+            cout << "Generating report...\n\n";
+            cout << fixed << setprecision(2);
+            cout << "========================================================\n";
+            cout << "           " << systemName << " - System Report\n";
+            cout << "========================================================\n";
+            cout << left << setw(40) << setfill('.') << "Fish in system" << right << setw(16) << fishCount << endl;
+            cout << left << setw(40) << setfill('.') << "Average weight of fish (g)" << right << setw(16) << fishAvgWeight << endl;
+            cout << left << setw(40) << setfill('.') << "System's total biomass (g)" << right << setw(16) << totalBiomass << endl;
+            cout << left << setw(40) << setfill('.') << "Current crop type" << right << setw(16) << cropType << endl;
+            cout << left << setw(40) << setfill('.') << "Growing space (sq ft)" << right << setw(16) << growingSpace << endl;
+            cout << left << setw(40) << setfill('.') << "Water volume (gallons)" << right << setw(16) << gallonsUsed << endl;
+            cout << left << setw(40) << setfill('.') << "Veggie feed needed (g)" << right << setw(16) << plantFeed(growingSpace, 1) << endl;
+            cout << left << setw(40) << setfill('.') << "Greens feed needed (g)" << right << setw(16) << plantFeed(growingSpace, 2) << endl;
+            cout << left << setw(40) << setfill('.') << "Weekly fish feed logged (g)" << right << setw(16) << weeklyTotal << endl;
+            cout << setfill(' ') << "========================================================\n";
+
+            saveReport(systemName, fishCount, fishAvgWeight, totalBiomass, cropType, growingSpace, gallonsUsed, weeklyTotal);
+            setColor(9);
             break;
 
-        default:
-            cout << "Invalid selection. Please try again." << endl;
+        case 5:
+            trackWeeklyFeed(dailyFeed, dayNames, DAYS);
+            break;
+
+        case 6:
+            cout << "Exiting My Aquaponics Helper. Happy growing!\n";
+            runMenu = false;
             break;
         }
-    } while (keepRunningMenu);
+    } while (runMenu);
 
+    setColor(7); // Back to normal white text
     return 0;
 }
-// Run program: Ctrl + F5 or Debug > Start Without Debugging menu
-// Debug program: F5 or Debug > Start Debugging menu
+
+void setColor(int color)
+{
+    HANDLE hConsole = GetStdHandle(STD_OUTPUT_HANDLE);
+    SetConsoleTextAttribute(hConsole, color);
+}
+
+void welcomeBanner()
+{
+    cout << "**************************************************\n";
+    cout << "*                                                *\n";
+    cout << "*          Welcome to My Aquaponics Helper       *\n";
+    cout << "*                                                *\n";
+    cout << "**************************************************\n\n";
+}
+// Get non-empty string input
+string getValidString(string prompt)
+{
+    string text;
+    cout << prompt;
+    getline(cin, text);
+    while (text == "") {
+        cout << "Input cannot be empty. Please try again: ";
+        getline(cin, text);
+    }
+    return text;
+}
+// Get valid integer input
+int getValidInt(string prompt, int minVal, int maxVal)
+{
+    int num;
+    cout << prompt;
+    while (!(cin >> num) || num < minVal || num > maxVal) {
+        cout << "Invalid input. Please enter a whole number between " << minVal << " and " << maxVal << ": ";
+        cin.clear();
+        cin.ignore(1000, '\n');
+    }
+    cin.ignore(1000, '\n');
+    return num;
+}
+// Get valid double input
+double getValidDouble(string prompt, double minVal, double maxVal)
+{
+    double num;
+    cout << prompt;
+    while (!(cin >> num) || num < minVal || num > maxVal) {
+        cout << "Invalid input. Please enter a number between " << minVal << " and " << maxVal << ": ";
+        cin.clear();
+        cin.ignore(1000, '\n');
+    }
+    cin.ignore(1000, '\n');
+    return num;
+}
+// Calculate plant feed
+double plantFeed(int growingSpace, int plantType)
+{
+    const int VEGGIE_FEED = 100;
+    const int GREENS_FEED = 50;
+    if (plantType == 1) {
+        return VEGGIE_FEED * growingSpace;
+    }
+    else if (plantType == 2) {
+        return GREENS_FEED * growingSpace;
+    }
+    return 0.0;
+}
+// Record 7 days of fish feed into array
+void trackWeeklyFeed(double dailyFeed[], string dayNames[], int size)
+{
+    double total = 0.0;
+    for (int i = 0; i < size; i++) {
+        dailyFeed[i] = getValidDouble("Enter amount of feed (in grams) for " + dayNames[i] + ": ", 0.0, 10000.0);
+        total += dailyFeed[i];
+    }
+    double avgFeed = total / size;
+    cout << fixed << setprecision(2);
+    cout << "\n--- Weekly Feeding Log ---\n";
+    for (int i = 0; i < size; i++) {
+        cout << dayNames[i] << ": " << dailyFeed[i] << " grams\n";
+    }
+    cout << "Total feed given over 7 days: " << total << " grams\n";
+    cout << "Average daily feed: " << avgFeed << " grams\n";
+}
+void userMenu()
+{
+    cout << "Please select from the following options:\n";
+    cout << "1. Calculate fish feed needs for your system\n";
+    cout << "2. Calculate plant feed needs\n";
+    cout << "3. Check water quality\n";
+    cout << "4. View and save system report\n";
+    cout << "5. Track weekly fish feeding\n";
+    cout << "6. Exit program\n";
+}
+// Save report to report.txt
+void saveReport(string systemName, int fishCount, double fishAvgWeight, double totalBiomass, string cropType, int growingSpace, int gallonsUsed, double weeklyTotal)
+{
+    ofstream outData;
+    outData.open("report.txt");
+    if (!outData) {
+        cout << "Error saving report to file.\n";
+        return;
+    }
+    outData << fixed << setprecision(2);
+    outData << "========================================================\n";
+    outData << "           " << systemName << " - System Report\n";
+    outData << "========================================================\n";
+    outData << left << setw(40) << setfill('.') << "Fish in system" << right << setw(16) << fishCount << endl;
+    outData << left << setw(40) << setfill('.') << "Average weight of fish (g)" << right << setw(16) << fishAvgWeight << endl;
+    outData << left << setw(40) << setfill('.') << "System's total biomass (g)" << right << setw(16) << totalBiomass << endl;
+    outData << left << setw(40) << setfill('.') << "Current crop type" << right << setw(16) << cropType << endl;
+    outData << left << setw(40) << setfill('.') << "Growing space (sq ft)" << right << setw(16) << growingSpace << endl;
+    outData << left << setw(40) << setfill('.') << "Water volume (gallons)" << right << setw(16) << gallonsUsed << endl;
+    outData << left << setw(40) << setfill('.') << "Veggie feed needed (g)" << right << setw(16) << plantFeed(growingSpace, 1) << endl;
+    outData << left << setw(40) << setfill('.') << "Greens feed needed (g)" << right << setw(16) << plantFeed(growingSpace, 2) << endl;
+    outData << left << setw(40) << setfill('.') << "Weekly fish feed logged (g)" << right << setw(16) << weeklyTotal << endl;
+    outData << setfill(' ') << "========================================================\n";
+    outData.close();
+    cout << "Report saved to report.txt!\n";
+}
